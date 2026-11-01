@@ -2,6 +2,7 @@
 #include "sd.hpp"
 #include "dpy.hpp"
 
+#include <Arduino.h>
 #include "src/beltgraph/include/beltgraph.h"
 
 void setup() {
@@ -9,11 +10,11 @@ void setup() {
   pin_setup();
 
   sd_setup(0);
-  
+
   dpy_setup();
   gui_setup();
 
-  /* テスト */
+  /* テスト シリアル通信を使うのはここだけにしておきます */
   Serial.begin(115200);
   while(!Serial);
 
@@ -26,7 +27,7 @@ void setup() {
   Serial.printf("wc_dim = %u\n", header.wc_dim);
   Serial.printf("wc_ind_name_size = %llu\n", header.wc_ind_name_size);
   Serial.printf("wc_ind_desc_size = %llu\n", header.wc_ind_desc_size);
-  
+
   Serial.printf("node_pos = %llu\n", header.node_pos);
   Serial.printf("node_count = %u\n", header.node_count);
   Serial.printf("node_stride = %llu\n", header.node_stride);
