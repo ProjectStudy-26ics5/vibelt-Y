@@ -3,15 +3,22 @@
 
 #include <SPI.h>
 #include <SdFat.h>
-#include "src/beltgraph/include/beltgraph/types.h"
+#include "src/beltgraph/include/beltgraph.h"
 
 #define SECTOR_SIZE 512
 
 static uint8_t sector_buffer[SECTOR_SIZE];
 static uint32_t sector_offset = 0;
 
-SdFat sd;
-SdCard *card = NULL;
+static SdFat sd;
+static SdCard *card = NULL;
+
+bgReader_t reader;
+bgHeader_t header;
+bgNodeContext_t nc;
+bgWayContext_t wc;
+
+
 
 void sd_setup(uint32_t starting_sector) {
   /**
@@ -21,6 +28,21 @@ void sd_setup(uint32_t starting_sector) {
   sd.begin(SD_SPI_CS, SD_SCK_MHZ(20));
   card = sd.card();
   sector_offset = starting_sector;
+
+  /**
+   * bg<T>Createのエラーチェックをしたほうがいいです。
+   * 今は、エラー時の選択肢がないのでほっときます。
+   */
+  bgReaderCreate(&reader, sd_read);
+
+  bgHeaderCreate(&header);
+  bgHeaderFetch(&header, &reader);
+
+  bgNodeContextCreate(&nc, &header);
+  bgNodeContextFetch(&nc, &reader, &header);
+
+  bgWayContextCreate(&wc, &header);
+  bgWayContextFetch(&wc, &reader, &header);
 }
 
 

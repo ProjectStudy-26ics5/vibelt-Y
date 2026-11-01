@@ -6,8 +6,8 @@
 #include <Adafruit_ILI9341.h>
 #include <XPT2046_Touchscreen.h>
 
-Adafruit_ILI9341 dpy(DPY_SPI_CS, DPY_DC, DPY_RST);
-XPT2046_Touchscreen tch(TCH_SPI_CS);
+static Adafruit_ILI9341 dpy(DPY_SPI_CS, DPY_DC, DPY_RST);
+static XPT2046_Touchscreen tch(TCH_SPI_CS);
 
 void dpy_setup(void) {
   digitalWrite(DPY_LED_GPIO, HIGH);
