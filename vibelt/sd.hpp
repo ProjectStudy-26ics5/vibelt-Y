@@ -9,7 +9,7 @@ extern SdFat sd;
 extern SdCard *card;
 
 /* 初期化 */
-void sd_setup(void);
+void sd_setup(uint32_t starting_sector);
 
 /* 読む */
 void sd_read(bgOffset_t pos, void *buffer, bgSize_t size);

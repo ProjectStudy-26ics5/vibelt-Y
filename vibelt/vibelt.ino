@@ -6,7 +6,7 @@ void setup() {
   /* 初期化順序は変更してはいけません */
   pin_setup();
 
-  sd_setup();
+  sd_setup(0);
   
   dpy_setup();
   gui_setup();
