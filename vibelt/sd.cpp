@@ -66,8 +66,8 @@ static void fetch_sector(uint32_t sector) {
 
 void sd_read(bgOffset_t pos, void *buffer, bgSize_t size) {
   for(bgSize_t i = 0; i < size; i++) {
-    uint32_t sector = pos / SECTOR_SIZE;
-    uint16_t lane = pos % SECTOR_SIZE;
+    uint32_t sector = (pos + i) / SECTOR_SIZE;
+    uint16_t lane   = (pos + i) % SECTOR_SIZE;
 
     fetch_sector(sector);
     ((uint8_t *)buffer)[i] = sector_buffer[lane];
