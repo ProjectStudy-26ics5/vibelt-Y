@@ -22,7 +22,10 @@ bgWayContext_t wc;
 
 vibelt_result_t sd_setup(uint32_t starting_sector) {
   /* SDカード */
-  sd.begin(SD_SPI_CS, SD_SCK_MHZ(20));
+  SdSpiConfig cfg(SD_SPI_CS, SHARED_SPI, SD_SCK_MHZ(20));
+  if(!sd.cardBegin(cfg)) {
+    return "SD card initialization failed.";
+  }
   card = sd.card();
   sector_offset = starting_sector;
 
