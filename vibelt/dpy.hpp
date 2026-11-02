@@ -1,8 +1,10 @@
 #ifndef VIBELT_DPY_HPP
 #define VIBELT_DPY_HPP
 
+#include "types.hpp"
+
 /* 初期化 */
-void dpy_setup(void);
-void gui_setup(void);
+vibelt_result_t dpy_setup(void);
+vibelt_result_t gui_setup(void);
 
 #endif

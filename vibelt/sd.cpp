@@ -20,29 +20,33 @@ bgWayContext_t wc;
 
 
 
-void sd_setup(uint32_t starting_sector) {
-  /**
-   * sd.beginとsd.cardにエラーチェックをしたほうがいいです。
-   * 今は、エラー時の選択肢がないのでほっときます。
-   */
+vibelt_result_t sd_setup(uint32_t starting_sector) {
+  /* SDカード */
   sd.begin(SD_SPI_CS, SD_SCK_MHZ(20));
   card = sd.card();
   sector_offset = starting_sector;
 
-  /**
-   * bg<T>Createのエラーチェックをしたほうがいいです。
-   * 今は、エラー時の選択肢がないのでほっときます。
-   */
-  bgReaderCreate(&reader, sd_read);
+  /* bgデータ */
+  bgError_t err;
+  err = bgReaderCreate(&reader, sd_read);
+  if(err != BG_ERROR_OK) goto bg_error;
 
-  bgHeaderCreate(&header);
+  err = bgHeaderCreate(&header);
+  if(err != BG_ERROR_OK) goto bg_error;
   bgHeaderFetch(&header, &reader);
 
-  bgNodeContextCreate(&nc, &header);
+  err = bgNodeContextCreate(&nc, &header);
+  if(err != BG_ERROR_OK) goto bg_error;
   bgNodeContextFetch(&nc, &reader, &header);
 
-  bgWayContextCreate(&wc, &header);
+  err = bgWayContextCreate(&wc, &header);
+  if(err != BG_ERROR_OK) goto bg_error;
   bgWayContextFetch(&wc, &reader, &header);
+
+  return VIBELT_OK;
+
+bg_error:
+  return "bg initialization failed.";
 }
 
 
@@ -50,26 +54,29 @@ void sd_setup(uint32_t starting_sector) {
 /**
  * sector_offset + sectorの物理セクタを読みます
  */
-static void fetch_sector(uint32_t sector) {
+static vibelt_result_t fetch_sector(uint32_t sector) {
   sector += sector_offset;
   static uint32_t last_fetch_sector = UINT32_MAX;
 
-  /**
-   * readSectorにエラーチェックをしたほうがいいです。
-   * 今は、エラー時の選択肢がないのでほっときます。
-   */
-  if(last_fetch_sector != sector) {
-    card->readSector(sector, sector_buffer);
-    last_fetch_sector = sector;
-  }
+  if(last_fetch_sector == sector) return VIBELT_OK;
+
+  card->readSector(sector, sector_buffer);
+  last_fetch_sector = sector;
+
+  return VIBELT_OK;
 }
 
 void sd_read(bgOffset_t pos, void *buffer, bgSize_t size) {
-  for(bgSize_t i = 0; i < size; i++) {
-    uint32_t sector = (pos + i) / SECTOR_SIZE;
-    uint16_t lane   = (pos + i) % SECTOR_SIZE;
+  vibelt_result_t result;
+  uint32_t sector, lane;
 
-    fetch_sector(sector);
+  for(bgSize_t i = 0; i < size; i++) {
+    sector = (pos + i) / SECTOR_SIZE;
+    lane   = (pos + i) % SECTOR_SIZE;
+
+    // 現状のbgの実装上、読み取り失敗の選択肢はがないので、パニックします。
+    vibelt_check(fetch_sector(sector));
+
     ((uint8_t *)buffer)[i] = sector_buffer[lane];
   }
 }

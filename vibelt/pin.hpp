@@ -1,11 +1,14 @@
 #ifndef VIBELT_PIN_HPP
 #define VIBELT_PIN_HPP
 
-#include <stdint.h>
+#include "types.hpp"
 
 /**
  * まだ作っていない部分は0にしています
  */
+
+/* オンボードLED */
+#define LED_GPIO     38
 
 /* SPI通信 */
 #define SPI_SCLK      6
@@ -43,6 +46,6 @@
 extern const uint8_t MT_GPIO_ARRAY[MT_GPIO_NUM];
 
 /* 初期化 */
-void pin_setup(void);
+vibelt_result_t pin_setup(void);
 
 #endif

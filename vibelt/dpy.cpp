@@ -9,7 +9,7 @@
 static Adafruit_ILI9341 dpy(DPY_SPI_CS, DPY_DC, DPY_RST);
 static XPT2046_Touchscreen tch(TCH_SPI_CS);
 
-void dpy_setup(void) {
+vibelt_result_t dpy_setup(void) {
   digitalWrite(DPY_LED_GPIO, HIGH);
 
   dpy.begin();
@@ -17,13 +17,17 @@ void dpy_setup(void) {
   
   tch.begin();
   tch.setRotation(1);
+
+  return VIBELT_OK;
 }
 
-void gui_setup(void) {
+vibelt_result_t gui_setup(void) {
   dpy.fillScreen(ILI9341_BLACK);
 
   dpy.setTextColor(ILI9341_WHITE);
   dpy.setTextSize(5);
   dpy.setCursor(20, 80);
   dpy.println("hello");
+
+  return VIBELT_OK;
 }

@@ -14,7 +14,12 @@ const uint8_t MT_GPIO_ARRAY[MT_GPIO_NUM] = {
   MT7_GPIO
 };
 
-void pin_setup(void) {
-  SPI.begin(SPI_SCLK, SPI_MISO, SPI_MOSI);
+vibelt_result_t pin_setup(void) {
+  if(!SPI.begin(SPI_SCLK, SPI_MISO, SPI_MOSI)) {
+    return "SPI initialization failed.";
+  }
+
   pinMode(DPY_LED_GPIO, OUTPUT);
+
+  return VIBELT_OK;
 }

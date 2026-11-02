@@ -1,3 +1,4 @@
+#include "types.hpp"
 #include "pin.hpp"
 #include "sd.hpp"
 #include "dpy.hpp"
@@ -6,18 +7,20 @@
 #include "src/beltgraph/include/beltgraph.h"
 
 void setup() {
-  /* 初期化順序は変更してはいけません */
-  pin_setup();
+  neopixelWrite(LED_GPIO, 0, 0, 0);
 
-  sd_setup(0);
-
-  dpy_setup();
-  gui_setup();
-
-  /* テスト シリアル通信を使うのはここだけにしておきます */
   Serial.begin(115200);
   while(!Serial);
+  
+  /* 初期化順序は変更してはいけません */
+  vibelt_check(pin_setup());
 
+  vibelt_check(sd_setup(0));
+
+  vibelt_check(dpy_setup());
+  vibelt_check(gui_setup());
+
+  /* テスト */
   Serial.printf("nc_pos = %llu\n", header.nc_pos);
   Serial.printf("nc_dim = %u\n", header.nc_dim);
   Serial.printf("nc_ind_name_size = %llu\n", header.nc_ind_name_size);
