@@ -56,14 +56,28 @@ static bool in_rect(uint16_t px, uint16_t py, uint16_t x, uint16_t y, uint16_t w
 #define GUI_NEUTRAL_WEIGHT_BTN_X (DPY_H_RES - GUI_NEUTRAL_WEIGHT_BTN_W)
 #define GUI_NEUTRAL_WEIGHT_BTN_Y 0
 
+#define GUI_NEUTRAL_DEST_BTN_W 60
+#define GUI_NEUTRAL_DEST_BTN_H 40
+#define GUI_NEUTRAL_DEST_BTN_X (DPY_H_RES - GUI_NEUTRAL_DEST_BTN_W)
+#define GUI_NEUTRAL_DEST_BTN_Y (GUI_NEUTRAL_WEIGHT_BTN_Y + GUI_NEUTRAL_WEIGHT_BTN_H + 3)
+
+#define GUI_NEUTRAL_ASTAR_BTN_W 80
+#define GUI_NEUTRAL_ASTAR_BTN_H 60
+#define GUI_NEUTRAL_ASTAR_BTN_X (DPY_H_RES - GUI_NEUTRAL_ASTAR_BTN_W)
+#define GUI_NEUTRAL_ASTAR_BTN_Y (DPY_V_RES - GUI_NEUTRAL_ASTAR_BTN_H)
+
 vibelt_result_t gui_neutral_setup(void) {
   dpy.fillScreen(ILI9341_WHITE);
 
   dpy.setTextColor(ILI9341_BLACK);
-  dpy.setCursor(20, DPY_V_RES / 2);
   dpy.setTextWrap(false);
   dpy.setTextSize(5);
-  dpy.print("hello! :D");
+  dpy.setCursor(10, 10);
+  dpy.print("hello");
+  dpy.setCursor(10, 80);
+  dpy.print(":D");
+  dpy.setCursor(10, 140);
+  dpy.print("MapView");
 
   /* 重み設定ボタン */
   dpy.fillRect(
@@ -76,6 +90,30 @@ vibelt_result_t gui_neutral_setup(void) {
   dpy.setTextWrap(false);
   dpy.setTextSize(5);
   dpy.print("=");
+
+  /* 目的地設定ボタン */
+  dpy.fillRect(
+    GUI_NEUTRAL_DEST_BTN_X, GUI_NEUTRAL_DEST_BTN_Y,
+    GUI_NEUTRAL_DEST_BTN_W, GUI_NEUTRAL_DEST_BTN_H,
+    ILI9341_BLACK
+  );
+  dpy.setTextColor(ILI9341_WHITE);
+  dpy.setCursor(GUI_NEUTRAL_DEST_BTN_X + 20, GUI_NEUTRAL_DEST_BTN_Y + 2);
+  dpy.setTextWrap(false);
+  dpy.setTextSize(5);
+  dpy.print("@");
+
+  /* A*ボタン */
+  dpy.fillRect(
+    GUI_NEUTRAL_ASTAR_BTN_X, GUI_NEUTRAL_ASTAR_BTN_Y,
+    GUI_NEUTRAL_ASTAR_BTN_W, GUI_NEUTRAL_ASTAR_BTN_H,
+    ILI9341_BLUE
+  );
+  dpy.setTextColor(ILI9341_WHITE);
+  dpy.setCursor(GUI_NEUTRAL_ASTAR_BTN_X + 10, GUI_NEUTRAL_ASTAR_BTN_Y + 10);
+  dpy.setTextWrap(false);
+  dpy.setTextSize(5);
+  dpy.print("A*");
 
   gui_id = GUI_NEUTRAL;
   return VIBELT_OK;
@@ -213,7 +251,7 @@ vibelt_result_t gui_weight_setup(void) {
       ILI9341_DARKGREY
     );
     dpy.setTextColor(ILI9341_WHITE);
-    dpy.setCursor(GUI_WEIGHT_NEXT_BTN_X + 20, GUI_WEIGHT_NEXT_BTN_Y);
+    dpy.setCursor(GUI_WEIGHT_NEXT_BTN_X + 20, GUI_WEIGHT_NEXT_BTN_Y + 2);
     dpy.setTextWrap(false);
     dpy.setTextSize(5);
     dpy.print(">");
@@ -227,7 +265,7 @@ vibelt_result_t gui_weight_setup(void) {
       ILI9341_DARKGREY
     );
     dpy.setTextColor(ILI9341_WHITE);
-    dpy.setCursor(GUI_WEIGHT_BACK_BTN_X + 20, GUI_WEIGHT_BACK_BTN_Y);
+    dpy.setCursor(GUI_WEIGHT_BACK_BTN_X + 20, GUI_WEIGHT_BACK_BTN_Y + 2);
     dpy.setTextWrap(false);
     dpy.setTextSize(5);
     dpy.print("<");
