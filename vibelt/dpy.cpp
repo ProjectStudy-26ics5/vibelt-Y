@@ -105,10 +105,12 @@ vibelt_result_t gui_neutral_runtime(void) {
 #define GUI_WEIGHT_ITEM_Y 10
 #define GUI_WEIGHT_ITEM_COUNT (DPY_V_RES / GUI_WEIGHT_ITEM_H)
 
-#define GUI_WEIGHT_ITEM_SLIDER_W 160
-#define GUI_WEIGHT_ITEM_SLIDER_H 16
+#define GUI_WEIGHT_ITEM_SLIDER_W 161
+#define GUI_WEIGHT_ITEM_SLIDER_H 17
 #define GUI_WEIGHT_ITEM_SLIDER_X 0
-#define GUI_WEIGHT_ITEM_SLIDER_Y 30
+#define GUI_WEIGHT_ITEM_SLIDER_Y 22
+#define GUI_WEIGHT_ITEM_SLIDER_HW (GUI_WEIGHT_ITEM_SLIDER_W / 2)
+#define GUI_WEIGHT_ITEM_SLIDER_HH (GUI_WEIGHT_ITEM_SLIDER_H / 2)
 
 #define GUI_WEIGHT_RETURN_BTN_W 60
 #define GUI_WEIGHT_RETURN_BTN_H 40
@@ -128,7 +130,44 @@ vibelt_result_t gui_neutral_runtime(void) {
 // 表示する重みの開始番号
 static bgIdx_t weight_begin = 0;
 
-static void weight_item(uint8_t i, const char *name) {
+static void weight_slider(uint16_t x, uint16_t y, bgWeight_t weight) {
+  /* マイナスボタン */
+
+  /* バー */
+  dpy.fillRect(
+    x, y,
+    GUI_WEIGHT_ITEM_SLIDER_W, GUI_WEIGHT_ITEM_SLIDER_H,
+    ILI9341_BLACK
+  );
+  dpy.drawFastHLine(
+    x, y + GUI_WEIGHT_ITEM_SLIDER_HH,
+    GUI_WEIGHT_ITEM_SLIDER_W,
+    ILI9341_LIGHTGREY
+  );
+  dpy.drawFastVLine(
+    x + GUI_WEIGHT_ITEM_SLIDER_HW, y,
+    GUI_WEIGHT_ITEM_SLIDER_H,
+    ILI9341_LIGHTGREY
+  );
+
+  if(weight > 0) {
+    dpy.fillRect(
+      x + GUI_WEIGHT_ITEM_SLIDER_HW + 1, y + GUI_WEIGHT_ITEM_SLIDER_HH - 1,
+      (uint16_t)(weight * GUI_WEIGHT_ITEM_SLIDER_HW), 3,
+      ILI9341_PINK
+    );
+  }else if(weight < 0) {
+    dpy.fillRect(
+      x + GUI_WEIGHT_ITEM_SLIDER_HW - 1, y + GUI_WEIGHT_ITEM_SLIDER_HH - 1,
+      (uint16_t)(weight * GUI_WEIGHT_ITEM_SLIDER_HW), 3,
+      ILI9341_CYAN
+    );
+  }
+
+  /* プラスボタン */
+}
+
+static void weight_item(uint8_t i, const char *name, bgWeight_t weight) {
   uint16_t x = GUI_WEIGHT_ITEM_X;
   uint16_t y = GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i;
   
@@ -136,24 +175,13 @@ static void weight_item(uint8_t i, const char *name) {
   dpy.setTextColor(ILI9341_WHITE);
   dpy.setCursor(x, y);
   dpy.setTextWrap(true);
-
   dpy.setTextSize(2);
   dpy.print(name); // このままでは、右側のボタンと被る可能性があります
 
   /* スライダ */
-  x += GUI_WEIGHT_ITEM_SLIDER_X;
-  y += GUI_WEIGHT_ITEM_SLIDER_Y;
-  
-  dpy.setCursor(x, y);
-  dpy.drawFastHLine(
-    x, y,
-    GUI_WEIGHT_ITEM_SLIDER_W,
-    ILI9341_LIGHTGREY
-  );
-  dpy.drawFastVLine(
-    x + GUI_WEIGHT_ITEM_SLIDER_W / 2, y - GUI_WEIGHT_ITEM_SLIDER_H / 2,
-    GUI_WEIGHT_ITEM_SLIDER_H,
-    ILI9341_LIGHTGREY
+  weight_slider(
+    x + GUI_WEIGHT_ITEM_SLIDER_X, y + GUI_WEIGHT_ITEM_SLIDER_Y,
+    weight
   );
 }
 
@@ -166,9 +194,19 @@ vibelt_result_t gui_weight_setup(void) {
     if(weight_i >= nc.dim + wc.dim) break;
 
     if(weight_i < nc.dim) {
-      weight_item(i, bgNodeContextIndicatorName(&nc, weight_i));
+      weight_item(
+        i,
+        bgNodeContextIndicatorName(&nc, weight_i),
+        nc.weights[weight_i]
+      );
     }else {
-      weight_item(i, bgWayContextIndicatorName(&wc, weight_i - nc.dim));
+      weight_i -= nc.dim;
+
+      weight_item(
+        i,
+        bgWayContextIndicatorName(&wc, weight_i),
+        wc.weights[weight_i]
+      );
     }
   }
 
