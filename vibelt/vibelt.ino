@@ -46,6 +46,10 @@ void loop() {
       vibelt_check(gui_neutral_runtime());
       break;
 
+    case GUI_WEIGHT:
+      vibelt_check(gui_weight_runtime());
+      break;
+
     default:
       vibelt_panic("unknown gui id.");
       break;

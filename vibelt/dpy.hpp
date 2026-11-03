@@ -19,4 +19,7 @@ vibelt_result_t dpy_setup(void);
 vibelt_result_t gui_neutral_setup(void);
 vibelt_result_t gui_neutral_runtime(void);
 
+vibelt_result_t gui_weight_setup(void);
+vibelt_result_t gui_weight_runtime(void);
+
 #endif

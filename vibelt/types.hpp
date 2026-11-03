@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "src/beltgraph/include/beltgraph/types.h"
 
 /**
  * NULLだったらOK

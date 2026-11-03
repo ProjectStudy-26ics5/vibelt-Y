@@ -2,7 +2,6 @@
 #define VIBELT_SD_HPP
 
 #include "types.hpp"
-#include "src/beltgraph/include/beltgraph/types.h"
 
 /* bg */
 extern bgReader_t reader;

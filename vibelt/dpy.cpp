@@ -1,10 +1,12 @@
 #include "dpy.hpp"
 #include "pin.hpp"
+#include "sd.hpp"
 
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <XPT2046_Touchscreen.h>
+#include "src/beltgraph/include/beltgraph.h"
 
 /**
  * ディスプレイのダブルバッファリングは
@@ -55,21 +57,21 @@ vibelt_result_t gui_neutral_setup(void) {
   dpy.fillScreen(ILI9341_WHITE);
 
   dpy.setTextColor(ILI9341_BLACK);
-  dpy.setTextSize(6);
-  dpy.setTextWrap(false);
   dpy.setCursor(20, DPY_V_RES / 2);
-  dpy.print("hello");
+  dpy.setTextWrap(false);
+  dpy.setTextSize(5);
+  dpy.print("hello! :D");
 
-  // 重み設定ボタン
+  /* 重み設定ボタン */
   dpy.fillRect(
     GUI_NEUTRAL_WEIGHT_BTN_X, GUI_NEUTRAL_WEIGHT_BTN_Y,
     GUI_NEUTRAL_WEIGHT_BTN_W, GUI_NEUTRAL_WEIGHT_BTN_H,
     ILI9341_BLACK
   );
   dpy.setTextColor(ILI9341_WHITE);
-  dpy.setTextSize(5);
-  dpy.setTextWrap(false);
   dpy.setCursor(GUI_NEUTRAL_WEIGHT_BTN_X + 20, GUI_NEUTRAL_WEIGHT_BTN_Y);
+  dpy.setTextWrap(false);
+  dpy.setTextSize(5);
   dpy.print("=");
 
   gui_id = GUI_NEUTRAL;
@@ -81,14 +83,155 @@ vibelt_result_t gui_neutral_runtime(void) {
     uint16_t px, py;
     tch_point(&px, &py);
     
+    /* 重み設定ボタン */
     if(in_rect(
       px, py,
       GUI_NEUTRAL_WEIGHT_BTN_X, GUI_NEUTRAL_WEIGHT_BTN_Y,
       GUI_NEUTRAL_WEIGHT_BTN_W, GUI_NEUTRAL_WEIGHT_BTN_H
     )) {
-      Serial.println("test");
+      gui_weight_setup();
+      delay(500);
     }
   }
   
+  return VIBELT_OK;
+}
+
+
+
+#define GUI_WEIGHT_ITEM_W (DPY_H_RES - 20)
+#define GUI_WEIGHT_ITEM_H 50
+#define GUI_WEIGHT_ITEM_X ((DPY_H_RES - GUI_WEIGHT_ITEM_W) / 2)
+#define GUI_WEIGHT_ITEM_Y 10
+#define GUI_WEIGHT_ITEM_COUNT (DPY_V_RES / GUI_WEIGHT_ITEM_H)
+
+#define GUI_WEIGHT_RETURN_BTN_W 60
+#define GUI_WEIGHT_RETURN_BTN_H 40
+#define GUI_WEIGHT_RETURN_BTN_X (DPY_H_RES - GUI_WEIGHT_RETURN_BTN_W)
+#define GUI_WEIGHT_RETURN_BTN_Y 0
+
+#define GUI_WEIGHT_BACK_BTN_W 60
+#define GUI_WEIGHT_BACK_BTN_H 40
+#define GUI_WEIGHT_BACK_BTN_X (DPY_H_RES - GUI_WEIGHT_BACK_BTN_W)
+#define GUI_WEIGHT_BACK_BTN_Y (DPY_V_RES - GUI_WEIGHT_BACK_BTN_H)
+
+#define GUI_WEIGHT_NEXT_BTN_W 60
+#define GUI_WEIGHT_NEXT_BTN_H 40
+#define GUI_WEIGHT_NEXT_BTN_X (DPY_H_RES - GUI_WEIGHT_NEXT_BTN_W)
+#define GUI_WEIGHT_NEXT_BTN_Y (GUI_WEIGHT_BACK_BTN_Y - GUI_WEIGHT_NEXT_BTN_H - 3)
+
+// 表示する重みの開始番号
+static bgIdx_t weight_begin = 0;
+
+vibelt_result_t gui_weight_setup(void) {
+  dpy.fillScreen(ILI9341_BLACK);
+
+  /* 重み項目 */
+  for(bgIdx_t i = 0; i < GUI_WEIGHT_ITEM_COUNT; i++) {
+    bgIdx_t weight_i = weight_begin + i;
+    if(weight_i >= nc.dim + wc.dim) break;
+
+    if(weight_i < nc.dim) {
+      dpy.setTextColor(ILI9341_WHITE);
+      dpy.setCursor(GUI_WEIGHT_ITEM_X, GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i);
+      dpy.setTextWrap(true);
+
+      dpy.setTextSize(2);
+      dpy.println(bgNodeContextIndicatorName(&nc, weight_i));
+      
+    }else {
+      weight_i -= nc.dim; // wcの重みインデックスにする
+
+      dpy.setTextColor(ILI9341_WHITE);
+      dpy.setCursor(GUI_WEIGHT_ITEM_X, GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i);
+      dpy.setTextWrap(true);
+
+      dpy.setTextSize(2);
+      dpy.println(bgWayContextIndicatorName(&wc, weight_i));
+    }
+  }
+
+  /* 戻るボタン */
+  dpy.fillRect(
+    GUI_WEIGHT_RETURN_BTN_X, GUI_WEIGHT_RETURN_BTN_Y,
+    GUI_WEIGHT_RETURN_BTN_W, GUI_WEIGHT_RETURN_BTN_H,
+    ILI9341_GREENYELLOW
+  );
+  dpy.setTextColor(ILI9341_WHITE);
+  dpy.setCursor(GUI_WEIGHT_RETURN_BTN_X + 20, GUI_WEIGHT_RETURN_BTN_Y);
+  dpy.setTextWrap(false);
+  dpy.setTextSize(5);
+  dpy.print("x");
+
+  /* 次の重みに進むボタン */
+  if(weight_begin + GUI_WEIGHT_ITEM_COUNT < nc.dim + wc.dim) {
+    dpy.fillRect(
+      GUI_WEIGHT_NEXT_BTN_X, GUI_WEIGHT_NEXT_BTN_Y,
+      GUI_WEIGHT_NEXT_BTN_W, GUI_WEIGHT_NEXT_BTN_H,
+      ILI9341_DARKGREY
+    );
+    dpy.setTextColor(ILI9341_WHITE);
+    dpy.setCursor(GUI_WEIGHT_NEXT_BTN_X + 20, GUI_WEIGHT_NEXT_BTN_Y);
+    dpy.setTextWrap(false);
+    dpy.setTextSize(5);
+    dpy.print(">");
+  }
+
+  /* 前の重みに戻るボタン */
+  if(weight_begin > 0) {
+    dpy.fillRect(
+      GUI_WEIGHT_BACK_BTN_X, GUI_WEIGHT_BACK_BTN_Y,
+      GUI_WEIGHT_BACK_BTN_W, GUI_WEIGHT_BACK_BTN_H,
+      ILI9341_DARKGREY
+    );
+    dpy.setTextColor(ILI9341_WHITE);
+    dpy.setCursor(GUI_WEIGHT_BACK_BTN_X + 20, GUI_WEIGHT_BACK_BTN_Y);
+    dpy.setTextWrap(false);
+    dpy.setTextSize(5);
+    dpy.print("<");
+  }
+  
+  gui_id = GUI_WEIGHT;
+  return VIBELT_OK;
+}
+
+vibelt_result_t gui_weight_runtime(void) {
+  if(tch.touched()) {
+    uint16_t px, py;
+    tch_point(&px, &py);
+    
+    /* 戻るボタン */
+    if(in_rect(
+      px, py,
+      GUI_WEIGHT_RETURN_BTN_X, GUI_WEIGHT_RETURN_BTN_Y,
+      GUI_WEIGHT_RETURN_BTN_W, GUI_WEIGHT_RETURN_BTN_H
+    )) {
+      gui_neutral_setup();
+      delay(500);
+    }
+
+    /* 次の重みに進むボタン */
+    if(weight_begin + GUI_WEIGHT_ITEM_COUNT < nc.dim + wc.dim && in_rect(
+      px, py,
+      GUI_WEIGHT_NEXT_BTN_X, GUI_WEIGHT_NEXT_BTN_Y,
+      GUI_WEIGHT_NEXT_BTN_W, GUI_WEIGHT_NEXT_BTN_H
+    )) {
+      weight_begin += GUI_WEIGHT_ITEM_COUNT;
+      gui_weight_setup();
+      delay(500);
+    }
+
+    /* 前の重みに戻るボタン */
+    if(weight_begin > 0 && in_rect(
+      px, py,
+      GUI_WEIGHT_BACK_BTN_X, GUI_WEIGHT_BACK_BTN_Y,
+      GUI_WEIGHT_BACK_BTN_W, GUI_WEIGHT_BACK_BTN_H
+    )) {
+      weight_begin -= GUI_WEIGHT_ITEM_COUNT;
+      gui_weight_setup();
+      delay(500);
+    }
+  }
+
   return VIBELT_OK;
 }
