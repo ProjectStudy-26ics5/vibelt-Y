@@ -46,6 +46,13 @@ vibelt_result_t sd_setup(uint32_t starting_sector) {
   if(err != BG_ERROR_OK) goto bg_error;
   bgWayContextFetch(&wc, &reader, &header);
 
+  for(bgIdx_t i = 0; i < nc.dim; i++) {
+    bgNodeContextSetWeight(&nc, i, 0);
+  }
+  for(bgIdx_t i = 0; i < wc.dim; i++) {
+    bgWayContextSetWeight(&wc, i, 0);
+  }
+
   return VIBELT_OK;
 
 bg_error:
