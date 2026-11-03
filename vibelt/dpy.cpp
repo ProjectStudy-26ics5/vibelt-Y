@@ -105,6 +105,11 @@ vibelt_result_t gui_neutral_runtime(void) {
 #define GUI_WEIGHT_ITEM_Y 10
 #define GUI_WEIGHT_ITEM_COUNT (DPY_V_RES / GUI_WEIGHT_ITEM_H)
 
+#define GUI_WEIGHT_ITEM_SLIDER_W 160
+#define GUI_WEIGHT_ITEM_SLIDER_H 16
+#define GUI_WEIGHT_ITEM_SLIDER_X 0
+#define GUI_WEIGHT_ITEM_SLIDER_Y 30
+
 #define GUI_WEIGHT_RETURN_BTN_W 60
 #define GUI_WEIGHT_RETURN_BTN_H 40
 #define GUI_WEIGHT_RETURN_BTN_X (DPY_H_RES - GUI_WEIGHT_RETURN_BTN_W)
@@ -123,31 +128,47 @@ vibelt_result_t gui_neutral_runtime(void) {
 // 表示する重みの開始番号
 static bgIdx_t weight_begin = 0;
 
+static void weight_item(uint8_t i, const char *name) {
+  uint16_t x = GUI_WEIGHT_ITEM_X;
+  uint16_t y = GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i;
+  
+  /* 名前 */
+  dpy.setTextColor(ILI9341_WHITE);
+  dpy.setCursor(x, y);
+  dpy.setTextWrap(true);
+
+  dpy.setTextSize(2);
+  dpy.print(name); // このままでは、右側のボタンと被る可能性があります
+
+  /* スライダ */
+  x += GUI_WEIGHT_ITEM_SLIDER_X;
+  y += GUI_WEIGHT_ITEM_SLIDER_Y;
+  
+  dpy.setCursor(x, y);
+  dpy.drawFastHLine(
+    x, y,
+    GUI_WEIGHT_ITEM_SLIDER_W,
+    ILI9341_LIGHTGREY
+  );
+  dpy.drawFastVLine(
+    x + GUI_WEIGHT_ITEM_SLIDER_W / 2, y - GUI_WEIGHT_ITEM_SLIDER_H / 2,
+    GUI_WEIGHT_ITEM_SLIDER_H,
+    ILI9341_LIGHTGREY
+  );
+}
+
 vibelt_result_t gui_weight_setup(void) {
   dpy.fillScreen(ILI9341_BLACK);
 
   /* 重み項目 */
-  for(bgIdx_t i = 0; i < GUI_WEIGHT_ITEM_COUNT; i++) {
+  for(uint8_t i = 0; i < GUI_WEIGHT_ITEM_COUNT; i++) {
     bgIdx_t weight_i = weight_begin + i;
     if(weight_i >= nc.dim + wc.dim) break;
 
     if(weight_i < nc.dim) {
-      dpy.setTextColor(ILI9341_WHITE);
-      dpy.setCursor(GUI_WEIGHT_ITEM_X, GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i);
-      dpy.setTextWrap(true);
-
-      dpy.setTextSize(2);
-      dpy.println(bgNodeContextIndicatorName(&nc, weight_i));
-      
+      weight_item(i, bgNodeContextIndicatorName(&nc, weight_i));
     }else {
-      weight_i -= nc.dim; // wcの重みインデックスにする
-
-      dpy.setTextColor(ILI9341_WHITE);
-      dpy.setCursor(GUI_WEIGHT_ITEM_X, GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i);
-      dpy.setTextWrap(true);
-
-      dpy.setTextSize(2);
-      dpy.println(bgWayContextIndicatorName(&wc, weight_i));
+      weight_item(i, bgWayContextIndicatorName(&wc, weight_i - nc.dim));
     }
   }
 
