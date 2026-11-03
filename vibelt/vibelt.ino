@@ -21,23 +21,20 @@ void setup() {
   vibelt_check(gui_neutral_setup());
 
   /* テスト */
-  Serial.printf("nc_pos = %llu\n", header.nc_pos);
-  Serial.printf("nc_dim = %u\n", header.nc_dim);
-  Serial.printf("nc_ind_name_size = %llu\n", header.nc_ind_name_size);
-  Serial.printf("nc_ind_desc_size = %llu\n", header.nc_ind_desc_size);
+  bgError_t err;
+  
+  bgAStarVisited_t visited;
+  err = bgAStarVisitedCreate(&visited, header.node_count, 0);
+  if(err != BG_ERROR_OK) vibelt_panic("");
+  
+  bgAStarHeap_t heap;
+  err = bgAStarHeapCreate(&heap, header.node_count);
+  if(err != BG_ERROR_OK) vibelt_panic("");
 
-  Serial.printf("wc_pos = %llu\n", header.wc_pos);
-  Serial.printf("wc_dim = %u\n", header.wc_dim);
-  Serial.printf("wc_ind_name_size = %llu\n", header.wc_ind_name_size);
-  Serial.printf("wc_ind_desc_size = %llu\n", header.wc_ind_desc_size);
+  bgPath_t path;
+  err = bgPathCreate(&path, header.node_count);
+  if(err != BG_ERROR_OK) vibelt_panic("");
 
-  Serial.printf("node_pos = %llu\n", header.node_pos);
-  Serial.printf("node_count = %u\n", header.node_count);
-  Serial.printf("node_stride = %llu\n", header.node_stride);
-
-  Serial.printf("way_pos = %llu\n", header.way_pos);
-  Serial.printf("way_count = %u\n", header.way_count);
-  Serial.printf("way_stride = %llu\n", header.way_stride);
 }
 
 void loop() {

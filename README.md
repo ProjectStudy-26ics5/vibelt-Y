@@ -56,7 +56,11 @@ diskutil eject "SDカードのパス"
 esp32 by Espressif Systems<br>
 ESP32S3 Dev Module
 
-## 4. 依存ライブラリ
+## 4. Arduino IDE設定
+外部PSRAMを使えるようにする。
+ツール > `PSRAM: "OPI PSRAM"`
+
+## 5. 依存ライブラリ
 * SdFat by Bill Greiman
 * Adafruit ILI9341 by Adafruit
 * XPT2046_Touchscreen by Paul Stoffregen
