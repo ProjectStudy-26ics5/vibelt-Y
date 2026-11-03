@@ -4,6 +4,7 @@
 #include "dpy.hpp"
 
 #include <Arduino.h>
+#include <time.h>
 #include "src/beltgraph/include/beltgraph.h"
 
 void setup() {
@@ -21,7 +22,17 @@ void setup() {
   vibelt_check(gui_neutral_setup());
 
   /* テスト */
+  return;
+
   bgError_t err;
+
+  bgNode_t node;
+  err = bgNodeCreate(&node, &header);
+  if(err != BG_ERROR_OK) vibelt_panic("");
+
+  bgWay_t way;
+  err = bgWayCreate(&way, &header);
+  if(err != BG_ERROR_OK) vibelt_panic("");
   
   bgAStarVisited_t visited;
   err = bgAStarVisitedCreate(&visited, header.node_count, 0);
@@ -35,6 +46,38 @@ void setup() {
   err = bgPathCreate(&path, header.node_count);
   if(err != BG_ERROR_OK) vibelt_panic("");
 
+  bgNodeFetchNearest(&node, &reader, &header, 139.751, 35.635);
+  bgIdx_t start_node_idx = node.idx;
+  bgNodeFetchNearest(&node, &reader, &header, 139.800, 35.635);
+  bgIdx_t goal_node_idx = node.idx;
+
+  clock_t start = clock();
+  err = bgAStar(
+    &reader, &header,
+    &nc, &wc,
+    &node, &way,
+    &visited, &heap,
+    start_node_idx, goal_node_idx,
+    2,
+    &path
+  );
+  clock_t end = clock();
+
+  if(err == BG_ERROR_OK) {
+    Serial.printf("Ok !\n");
+
+    Serial.printf("path = {");
+    for(bgIdx_t i = 0; i < path.size; i++) {
+      Serial.printf("%u -> ", path.node_idx_order[i]);
+    }
+    Serial.printf("\b\b\b\b}    \n\n");
+  }else {
+    Serial.printf("Err !\n");
+  }
+  Serial.printf("time: %.4lf sec\n", (double)(end - start) / CLOCKS_PER_SEC);
+  Serial.printf("| visited | allocated: %u, used: %u\n", visited.capacity, visited.size);
+  Serial.printf("| heap    | allocated: %u, used: %u\n", heap.capacity, heap.peak_size);
+  Serial.printf("| path    | allocated: %u, used: %u\n", path.capacity, path.size);
 }
 
 void loop() {
