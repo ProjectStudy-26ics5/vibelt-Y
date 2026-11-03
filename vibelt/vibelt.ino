@@ -18,7 +18,7 @@ void setup() {
   vibelt_check(sd_setup(0));
 
   vibelt_check(dpy_setup());
-  vibelt_check(gui_setup());
+  vibelt_check(gui_neutral_setup());
 
   /* テスト */
   Serial.printf("nc_pos = %llu\n", header.nc_pos);
@@ -41,4 +41,15 @@ void setup() {
 }
 
 void loop() {
+  switch(gui_id) {
+    case GUI_NEUTRAL:
+      vibelt_check(gui_neutral_runtime());
+      break;
+
+    default:
+      vibelt_panic("unknown gui id.");
+      break;
+  }
+
+  delay(50);
 }
