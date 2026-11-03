@@ -22,8 +22,26 @@ void setup() {
   vibelt_check(gui_neutral_setup());
 
   /* テスト */
-  return;
+  Serial.printf("nc_pos = %llu\n", header.nc_pos);
+  Serial.printf("nc_dim = %u\n", header.nc_dim);
+  Serial.printf("nc_ind_name_size = %llu\n", header.nc_ind_name_size);
+  Serial.printf("nc_ind_desc_size = %llu\n", header.nc_ind_desc_size);
 
+  Serial.printf("wc_pos = %llu\n", header.wc_pos);
+  Serial.printf("wc_dim = %u\n", header.wc_dim);
+  Serial.printf("wc_ind_name_size = %llu\n", header.wc_ind_name_size);
+  Serial.printf("wc_ind_desc_size = %llu\n", header.wc_ind_desc_size);
+
+  Serial.printf("node_pos = %llu\n", header.node_pos);
+  Serial.printf("node_count = %u\n", header.node_count);
+  Serial.printf("node_stride = %llu\n", header.node_stride);
+
+  Serial.printf("way_pos = %llu\n", header.way_pos);
+  Serial.printf("way_count = %u\n", header.way_count);
+  Serial.printf("way_stride = %llu\n", header.way_stride);
+
+  /* 経路探索テスト 計算が大変なので、普段はしない */
+  return;
   bgError_t err;
 
   bgNode_t node;
