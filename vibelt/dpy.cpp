@@ -16,7 +16,10 @@
 static Adafruit_ILI9341 dpy(DPY_SPI_CS, DPY_DC, DPY_RST);
 static XPT2046_Touchscreen tch(TCH_SPI_CS);
 
+// 表示しているguiの種類
 gui_kind_t gui_id = GUI_NEUTRAL;
+// 重みguiで表示する重みの開始番号
+static bgIdx_t weight_begin = 0;
 
 vibelt_result_t dpy_setup(void) {
   digitalWrite(DPY_LED_GPIO, HIGH);
@@ -40,7 +43,7 @@ static void tch_point(uint16_t *px, uint16_t *py) {
 }
 
 static bool in_rect(uint16_t px, uint16_t py, uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
-  if(x <= px && px <= x + w && y <= py && py <= y + h) {
+  if(x <= px && px < x + w && y <= py && py < y + h) {
     return true;
   }
   return false;
@@ -99,16 +102,16 @@ vibelt_result_t gui_neutral_runtime(void) {
 
 
 
-#define GUI_WEIGHT_ITEM_W (DPY_H_RES - 20)
+#define GUI_WEIGHT_ITEM_W DPY_H_RES
 #define GUI_WEIGHT_ITEM_H 50
-#define GUI_WEIGHT_ITEM_X ((DPY_H_RES - GUI_WEIGHT_ITEM_W) / 2)
+#define GUI_WEIGHT_ITEM_X 10
 #define GUI_WEIGHT_ITEM_Y 10
 #define GUI_WEIGHT_ITEM_COUNT (DPY_V_RES / GUI_WEIGHT_ITEM_H)
 
 #define GUI_WEIGHT_ITEM_SLIDER_W 161
-#define GUI_WEIGHT_ITEM_SLIDER_H 17
-#define GUI_WEIGHT_ITEM_SLIDER_X 0
-#define GUI_WEIGHT_ITEM_SLIDER_Y 22
+#define GUI_WEIGHT_ITEM_SLIDER_H 25
+#define GUI_WEIGHT_ITEM_SLIDER_X 20
+#define GUI_WEIGHT_ITEM_SLIDER_Y 18
 #define GUI_WEIGHT_ITEM_SLIDER_HW (GUI_WEIGHT_ITEM_SLIDER_W / 2)
 #define GUI_WEIGHT_ITEM_SLIDER_HH (GUI_WEIGHT_ITEM_SLIDER_H / 2)
 
@@ -127,13 +130,16 @@ vibelt_result_t gui_neutral_runtime(void) {
 #define GUI_WEIGHT_NEXT_BTN_X (DPY_H_RES - GUI_WEIGHT_NEXT_BTN_W)
 #define GUI_WEIGHT_NEXT_BTN_Y (GUI_WEIGHT_BACK_BTN_Y - GUI_WEIGHT_NEXT_BTN_H - 3)
 
-// 表示する重みの開始番号
-static bgIdx_t weight_begin = 0;
+
+static void weight_name(uint16_t x, uint16_t y, const char *name) {
+  dpy.setTextColor(ILI9341_WHITE);
+  dpy.setCursor(x, y);
+  dpy.setTextWrap(true);
+  dpy.setTextSize(2);
+  dpy.print(name); // このままでは、右側のボタンと被る可能性があります
+}
 
 static void weight_slider(uint16_t x, uint16_t y, bgWeight_t weight) {
-  /* マイナスボタン */
-
-  /* バー */
   dpy.fillRect(
     x, y,
     GUI_WEIGHT_ITEM_SLIDER_W, GUI_WEIGHT_ITEM_SLIDER_H,
@@ -163,26 +169,6 @@ static void weight_slider(uint16_t x, uint16_t y, bgWeight_t weight) {
       ILI9341_CYAN
     );
   }
-
-  /* プラスボタン */
-}
-
-static void weight_item(uint8_t i, const char *name, bgWeight_t weight) {
-  uint16_t x = GUI_WEIGHT_ITEM_X;
-  uint16_t y = GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i;
-  
-  /* 名前 */
-  dpy.setTextColor(ILI9341_WHITE);
-  dpy.setCursor(x, y);
-  dpy.setTextWrap(true);
-  dpy.setTextSize(2);
-  dpy.print(name); // このままでは、右側のボタンと被る可能性があります
-
-  /* スライダ */
-  weight_slider(
-    x + GUI_WEIGHT_ITEM_SLIDER_X, y + GUI_WEIGHT_ITEM_SLIDER_Y,
-    weight
-  );
 }
 
 vibelt_result_t gui_weight_setup(void) {
@@ -193,20 +179,17 @@ vibelt_result_t gui_weight_setup(void) {
     bgIdx_t weight_i = weight_begin + i;
     if(weight_i >= nc.dim + wc.dim) break;
 
+    uint16_t x = GUI_WEIGHT_ITEM_X;
+    uint16_t y = GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i;
+
     if(weight_i < nc.dim) {
-      weight_item(
-        i,
-        bgNodeContextIndicatorName(&nc, weight_i),
-        nc.weights[weight_i]
-      );
+      weight_name(x, y, bgNodeContextIndicatorName(&nc, weight_i));
+      weight_slider(x + GUI_WEIGHT_ITEM_SLIDER_X, y + GUI_WEIGHT_ITEM_SLIDER_Y, nc.weights[weight_i]);
     }else {
       weight_i -= nc.dim;
 
-      weight_item(
-        i,
-        bgWayContextIndicatorName(&wc, weight_i),
-        wc.weights[weight_i]
-      );
+      weight_name(x, y, bgWayContextIndicatorName(&wc, weight_i));
+      weight_slider(x + GUI_WEIGHT_ITEM_SLIDER_X, y + GUI_WEIGHT_ITEM_SLIDER_Y, wc.weights[weight_i]);
     }
   }
 
@@ -265,8 +248,34 @@ vibelt_result_t gui_weight_runtime(void) {
       GUI_WEIGHT_RETURN_BTN_X, GUI_WEIGHT_RETURN_BTN_Y,
       GUI_WEIGHT_RETURN_BTN_W, GUI_WEIGHT_RETURN_BTN_H
     )) {
+      weight_begin = 0;
       gui_neutral_setup();
       delay(500);
+    }
+
+    /* スライダ */
+    for(uint8_t i = 0; i < GUI_WEIGHT_ITEM_COUNT; i++) {
+      bgIdx_t weight_i = weight_begin + i;
+      if(weight_i >= nc.dim + wc.dim) break;
+
+      uint16_t x = GUI_WEIGHT_ITEM_X + GUI_WEIGHT_ITEM_SLIDER_X;
+      uint16_t y = GUI_WEIGHT_ITEM_Y + GUI_WEIGHT_ITEM_H * i + GUI_WEIGHT_ITEM_SLIDER_Y;
+
+      if(in_rect(
+        px, py,
+        x, y,
+        GUI_WEIGHT_ITEM_SLIDER_W, GUI_WEIGHT_ITEM_SLIDER_H
+      )) {
+        bgWeight_t weight = ((float)px - (float)(x + GUI_WEIGHT_ITEM_SLIDER_HW)) / (float)(GUI_WEIGHT_ITEM_SLIDER_HW);
+        
+        if(weight_i < nc.dim) {
+          weight_slider(x, y, (nc.weights[weight_i] = weight));
+        }else {
+          weight_i -= nc.dim;
+
+          weight_slider(x, y, (wc.weights[weight_i] = weight));
+        }
+      }
     }
 
     /* 次の重みに進むボタン */
