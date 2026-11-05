@@ -9,7 +9,31 @@ v1.0.0-betaを用います。
 `vibelt/src/beltgraph`に配置しています。
 Arduino IDEの仕様で、ディレクトリをネストした構造にするために、`src/`というディレクトリ下に置いています。
 
-## 2. bgをSDカードに書き込む
+## 2. 使用部品
+|種別|型番|メーカ|
+|-|-|-|
+|マイコン|ESP32-S3-DevKitC-1-N8R8|Espressif Systems Pte. Ltd.|
+|タッチパネル付き液晶|MSP2807|Kuongshun Electronic Limitied|
+|SDカードリーダ|AE-MICRO-SD-DIP|(株)秋月電子通商|
+|GPUモジュール|Air530|Seeed Technology Co., Ltd.|
+|地磁気センサ|AE-BNO055-BO|(株)秋月電子通商|
+|振動モータ|LBV10B-009|日本電産コパル電子(株)|
+
+## 3. ボードマネージャ
+esp32 by Espressif Systems<br>
+ESP32S3 Dev Module
+
+## 4. Arduino IDE設定
+外部PSRAMを使えるようにする。
+ツール > `PSRAM: "OPI PSRAM"`
+
+## 5. 依存ライブラリ
+* SdFat by Bill Greiman
+* Adafruit ILI9341 by Adafruit
+* XPT2046_Touchscreen by Paul Stoffregen
+* TinyGPSPlus by Mikal Hart
+
+## 6. bgをSDカードに書き込む方法
 ファイルシステムを利用しないで、生書き込みをします。
 元のデータは失われます。
 元の運用に戻したい場合は、SDカードをフォーマットしなおしてください。
@@ -51,17 +75,3 @@ sudo head -c 1024 "SDカードのパス" | xxd
 ```bash
 diskutil eject "SDカードのパス"
 ```
-
-## 3. ボードマネージャ
-esp32 by Espressif Systems<br>
-ESP32S3 Dev Module
-
-## 4. Arduino IDE設定
-外部PSRAMを使えるようにする。
-ツール > `PSRAM: "OPI PSRAM"`
-
-## 5. 依存ライブラリ
-* SdFat by Bill Greiman
-* Adafruit ILI9341 by Adafruit
-* XPT2046_Touchscreen by Paul Stoffregen
-* TinyGPSPlus by Mikal Hart
