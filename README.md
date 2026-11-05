@@ -1,6 +1,6 @@
 # ProjectStudy-26ics5 Vibelt
 2026年度 東京科学大学付属科学技術高等学校 課題研究 情報システム分野 5班<br>
-デバイス側のArduino言語プログラムです。
+デバイス側のArduino言語プログラムとKiCad回路図です。
 
 ## 1. beltgraph
 https://github.com/ProjectStudy-26ics5/graph-X.git<br>
