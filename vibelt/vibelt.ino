@@ -76,7 +76,7 @@ void setup() {
     &node, &way,
     &visited, &heap,
     start_node_idx, goal_node_idx,
-    2,
+    1,
     &path
   );
   clock_t end = clock();

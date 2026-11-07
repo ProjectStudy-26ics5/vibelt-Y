@@ -1,8 +1,9 @@
 #include "sd.hpp"
 #include "pin.hpp"
 
-#include <SPI.h>
-#include <SdFat.h>
+#include <driver/sdmmc_host.h>
+#include <sdmmc_cmd.h>
+#include <esp_err.h>
 #include "src/beltgraph/include/beltgraph.h"
 
 #define SECTOR_SIZE 512
@@ -10,24 +11,41 @@
 static uint8_t sector_buffer[SECTOR_SIZE];
 static uint32_t sector_offset = 0;
 
-static SdFat sd;
-static SdCard *card = NULL;
-
 bgReader_t reader;
 bgHeader_t header;
 bgNodeContext_t nc;
 bgWayContext_t wc;
 
+sdmmc_card_t card;
+sdmmc_host_t host;
+
 
 
 vibelt_result_t sd_setup(uint32_t starting_sector) {
+  sector_offset = starting_sector;
+
   /* SDカード */
-  SdSpiConfig cfg(SD_SPI_CS, SHARED_SPI, SD_SCK_MHZ(20));
-  if(!sd.cardBegin(cfg)) {
+  host = SDMMC_HOST_DEFAULT();
+  host.max_freq_khz = SDMMC_FREQ_HIGHSPEED;
+
+  sdmmc_slot_config_t slot = SDMMC_SLOT_CONFIG_DEFAULT();
+  slot.width = 4;
+  slot.clk = (gpio_num_t)SD_CLK;
+  slot.cmd = (gpio_num_t)SD_CMD;
+  slot.d0  = (gpio_num_t)SD_DAT0;
+  slot.d1  = (gpio_num_t)SD_DAT1;
+  slot.d2  = (gpio_num_t)SD_DAT2;
+  slot.d3  = (gpio_num_t)SD_DAT3;
+
+  if(host.init() != ESP_OK) {
+    return "SD host initialization failed.";
+  }
+  if(sdmmc_host_init_slot(host.slot, &slot) != ESP_OK) {
+    return "SD slot initialization failed.";
+  }
+  if(sdmmc_card_init(&host, &card) != ESP_OK) {
     return "SD card initialization failed.";
   }
-  card = sd.card();
-  sector_offset = starting_sector;
 
   /* bgデータ */
   bgError_t err;
@@ -67,10 +85,11 @@ bg_error:
 static vibelt_result_t fetch_sector(uint32_t sector) {
   sector += sector_offset;
   static uint32_t last_fetch_sector = UINT32_MAX;
-
   if(last_fetch_sector == sector) return VIBELT_OK;
 
-  card->readSector(sector, sector_buffer);
+  if(sdmmc_read_sectors(&card, sector_buffer, sector, 1) != ESP_OK) {
+    return "SD card read failed.";
+  }
   last_fetch_sector = sector;
 
   return VIBELT_OK;

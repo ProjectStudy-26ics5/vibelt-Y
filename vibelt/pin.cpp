@@ -15,10 +15,11 @@ const uint8_t MT_GPIO_ARRAY[MT_GPIO_NUM] = {
 };
 
 vibelt_result_t pin_setup(void) {
-  if(!SPI.begin(SPI_SCLK, SPI_MISO, SPI_MOSI)) {
+  if(!SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI)) {
     return "SPI initialization failed.";
   }
 
+  pinMode(SD_SW, INPUT);
   pinMode(DPY_LED_GPIO, OUTPUT);
 
   return VIBELT_OK;

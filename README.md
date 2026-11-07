@@ -28,7 +28,6 @@ ESP32S3 Dev Module
 ツール > `PSRAM: "OPI PSRAM"`
 
 ## 5. 依存ライブラリ
-* SdFat by Bill Greiman
 * Adafruit ILI9341 by Adafruit
 * XPT2046_Touchscreen by Paul Stoffregen
 * TinyGPSPlus by Mikal Hart

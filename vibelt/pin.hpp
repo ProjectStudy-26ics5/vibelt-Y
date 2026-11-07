@@ -10,14 +10,19 @@
 /* オンボードLED */
 #define LED_GPIO     38
 
+/* SDカード */
+#define SD_CMD       12
+#define SD_CLK       11
+#define SD_DAT0      10
+#define SD_DAT1       9
+#define SD_DAT2      14
+#define SD_DAT3      13
+#define SD_SW        46
+
 /* SPI通信 */
-#define SPI_SCLK      6
+#define SPI_CLK       7
 #define SPI_MOSI      5
 #define SPI_MISO      4
-
-/* UART通信 */
-#define UART_TX       0
-#define UART_RX       0
 
 /* ディスプレイ */
 #define DPY_SPI_CS   18
@@ -26,11 +31,7 @@
 #define DPY_LED_GPIO 15
 
 /* タッチパネル */
-#define TCH_SPI_CS    7
-
-/* SDカード */
-#define SD_SPI_CS     8
-#define SD_SW         0
+#define TCH_SPI_CS    6
 
 /* 振動モータ */
 #define MT0_GPIO      0
