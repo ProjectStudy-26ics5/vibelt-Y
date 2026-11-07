@@ -19,3 +19,18 @@ void vibelt_check(vibelt_result_t err) {
     vibelt_panic(err);
   }
 }
+
+void vibelt_bg_check(bgError_t err) {
+  switch(err) {
+    case BG_ERROR_OK:
+      return;
+    case BG_ERROR_ALLOC:
+      vibelt_panic("bg allocation failed.");
+    case BG_ERROR_CAP:
+      vibelt_panic("bg capacity error.");
+    case BG_ERROR_LOGIC:
+      vibelt_panic("bg logic error.");
+    default:
+      vibelt_panic("unknown bg error.");
+  }
+}

@@ -48,22 +48,26 @@ vibelt_result_t sd_setup(uint32_t starting_sector) {
   }
 
   /* bgデータ */
-  bgError_t err;
-  err = bgReaderCreate(&reader, sd_read);
-  if(err != BG_ERROR_OK) goto bg_error;
+  if(bgReaderCreate(&reader, sd_read) != BG_ERROR_OK) {
+    return "bg reader initialization failed.";
+  }
 
-  err = bgHeaderCreate(&header);
-  if(err != BG_ERROR_OK) goto bg_error;
+  if(bgHeaderCreate(&header) != BG_ERROR_OK) {
+    return "bg header initialization failed.";
+  }
   bgHeaderFetch(&header, &reader);
 
-  err = bgNodeContextCreate(&nc, &header);
-  if(err != BG_ERROR_OK) goto bg_error;
+  if(bgNodeContextCreate(&nc, &header) != BG_ERROR_OK) {
+    return "bg node context initialization failed.";
+  }
   bgNodeContextFetch(&nc, &reader, &header);
 
-  err = bgWayContextCreate(&wc, &header);
-  if(err != BG_ERROR_OK) goto bg_error;
+  if(bgWayContextCreate(&wc, &header) != BG_ERROR_OK) {
+    return "bg way context initialization failed.";
+  }
   bgWayContextFetch(&wc, &reader, &header);
 
+  // 重みを0で初期化
   for(bgIdx_t i = 0; i < nc.dim; i++) {
     bgNodeContextSetWeight(&nc, i, 0);
   }
@@ -72,9 +76,6 @@ vibelt_result_t sd_setup(uint32_t starting_sector) {
   }
 
   return VIBELT_OK;
-
-bg_error:
-  return "bg initialization failed.";
 }
 
 

@@ -45,24 +45,16 @@ void setup() {
   bgError_t err;
 
   bgNode_t node;
-  err = bgNodeCreate(&node, &header);
-  if(err != BG_ERROR_OK) vibelt_panic("");
-
+  vibelt_bg_check(bgNodeCreate(&node, &header));
   bgWay_t way;
-  err = bgWayCreate(&way, &header);
-  if(err != BG_ERROR_OK) vibelt_panic("");
+  vibelt_bg_check(bgWayCreate(&way, &header));
   
   bgAStarVisited_t visited;
-  err = bgAStarVisitedCreate(&visited, header.node_count, 0);
-  if(err != BG_ERROR_OK) vibelt_panic("");
-  
+  vibelt_bg_check(bgAStarVisitedCreate(&visited, header.node_count, 0));
   bgAStarHeap_t heap;
-  err = bgAStarHeapCreate(&heap, header.node_count);
-  if(err != BG_ERROR_OK) vibelt_panic("");
-
+  vibelt_bg_check(bgAStarHeapCreate(&heap, header.node_count));
   bgPath_t path;
-  err = bgPathCreate(&path, header.node_count);
-  if(err != BG_ERROR_OK) vibelt_panic("");
+  vibelt_bg_check(bgPathCreate(&path, header.node_count));
 
   bgNodeFetchNearest(&node, &reader, &header, 139.751, 35.635);
   bgIdx_t start_node_idx = node.idx;
@@ -70,7 +62,7 @@ void setup() {
   bgIdx_t goal_node_idx = node.idx;
 
   clock_t start = clock();
-  err = bgAStar(
+  vibelt_bg_check(bgAStar(
     &reader, &header,
     &nc, &wc,
     &node, &way,
@@ -78,20 +70,15 @@ void setup() {
     start_node_idx, goal_node_idx,
     1,
     &path
-  );
+  ));
   clock_t end = clock();
 
-  if(err == BG_ERROR_OK) {
-    Serial.printf("Ok !\n");
-
-    Serial.printf("path = {");
-    for(bgIdx_t i = 0; i < path.size; i++) {
-      Serial.printf("%u -> ", path.node_idx_order[i]);
-    }
-    Serial.printf("\b\b\b\b}    \n\n");
-  }else {
-    Serial.printf("Err !\n");
+  Serial.printf("path = {");
+  for(bgIdx_t i = 0; i < path.size; i++) {
+    Serial.printf("%u -> ", path.node_idx_order[i]);
   }
+  Serial.printf("}\n");
+
   Serial.printf("time: %.4lf sec\n", (double)(end - start) / CLOCKS_PER_SEC);
   Serial.printf("| visited | allocated: %u, used: %u\n", visited.capacity, visited.size);
   Serial.printf("| heap    | allocated: %u, used: %u\n", heap.capacity, heap.peak_size);

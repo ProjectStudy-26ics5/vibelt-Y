@@ -168,7 +168,6 @@ vibelt_result_t gui_neutral_runtime(void) {
 #define GUI_WEIGHT_NEXT_BTN_X (DPY_H_RES - GUI_WEIGHT_NEXT_BTN_W)
 #define GUI_WEIGHT_NEXT_BTN_Y (GUI_WEIGHT_BACK_BTN_Y - GUI_WEIGHT_NEXT_BTN_H - 3)
 
-
 static void weight_name(uint16_t x, uint16_t y, const char *name) {
   dpy.setTextColor(ILI9341_WHITE);
   dpy.setCursor(x, y);

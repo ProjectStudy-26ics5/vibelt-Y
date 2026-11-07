@@ -14,5 +14,6 @@ typedef const char *vibelt_result_t;
 
 void vibelt_panic(vibelt_result_t err);
 void vibelt_check(vibelt_result_t err);
+void vibelt_bg_check(bgError_t err);
 
 #endif
