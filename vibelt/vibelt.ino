@@ -1,7 +1,6 @@
-#include "types.hpp"
-#include "pin.hpp"
-#include "sd.hpp"
-#include "dpy.hpp"
+#include "src/common.hpp"
+#include "src/peripherals.hpp"
+#include "src/gui.hpp"
 
 #include <Arduino.h>
 #include <time.h>
@@ -9,96 +8,51 @@
 
 void setup() {
   neopixelWrite(LED_GPIO, 0, 0, 0);
-
   Serial.begin(115200);
-  while(!Serial);
-  
-  /* 初期化順序は変更してはいけません */
-  vibelt_check(pin_setup());
 
-  vibelt_check(sd_setup(0));
-
-  vibelt_check(dpy_setup());
-  vibelt_check(gui_neutral_setup());
+  vb::check(vb::sd_setup(0));
+  vb::check(vb::dpy_setup());
+  vb::check(vb::bg_setup());
+  vb::check(vb::gui_change(vb::GuiKind::Root));
 
   /* テスト */
-  Serial.printf("nc_pos = %llu\n", header.nc_pos);
-  Serial.printf("nc_dim = %u\n", header.nc_dim);
-  Serial.printf("nc_ind_name_size = %llu\n", header.nc_ind_name_size);
-  Serial.printf("nc_ind_desc_size = %llu\n", header.nc_ind_desc_size);
+  Serial.printf("nc_pos = %llu\n", vb::header.nc_pos);
+  Serial.printf("nc_dim = %u\n", vb::header.nc_dim);
+  Serial.printf("nc_ind_name_size = %llu\n", vb::header.nc_ind_name_size);
+  Serial.printf("nc_ind_desc_size = %llu\n", vb::header.nc_ind_desc_size);
 
-  Serial.printf("wc_pos = %llu\n", header.wc_pos);
-  Serial.printf("wc_dim = %u\n", header.wc_dim);
-  Serial.printf("wc_ind_name_size = %llu\n", header.wc_ind_name_size);
-  Serial.printf("wc_ind_desc_size = %llu\n", header.wc_ind_desc_size);
+  Serial.printf("wc_pos = %llu\n", vb::header.wc_pos);
+  Serial.printf("wc_dim = %u\n", vb::header.wc_dim);
+  Serial.printf("wc_ind_name_size = %llu\n", vb::header.wc_ind_name_size);
+  Serial.printf("wc_ind_desc_size = %llu\n", vb::header.wc_ind_desc_size);
 
-  Serial.printf("node_pos = %llu\n", header.node_pos);
-  Serial.printf("node_count = %u\n", header.node_count);
-  Serial.printf("node_stride = %llu\n", header.node_stride);
+  Serial.printf("node_pos = %llu\n", vb::header.node_pos);
+  Serial.printf("node_count = %u\n", vb::header.node_count);
+  Serial.printf("node_stride = %llu\n", vb::header.node_stride);
 
-  Serial.printf("way_pos = %llu\n", header.way_pos);
-  Serial.printf("way_count = %u\n", header.way_count);
-  Serial.printf("way_stride = %llu\n", header.way_stride);
+  Serial.printf("way_pos = %llu\n", vb::header.way_pos);
+  Serial.printf("way_count = %u\n", vb::header.way_count);
+  Serial.printf("way_stride = %llu\n", vb::header.way_stride);
 
-  /* 経路探索テスト 計算が大変なので、普段はしない */
-  return;
-  bgError_t err;
-
-  bgNode_t node;
-  vibelt_bg_check(bgNodeCreate(&node, &header));
-  bgWay_t way;
-  vibelt_bg_check(bgWayCreate(&way, &header));
+  /* 経路探索テスト */
+  bgNodeFetchNearest(&vb::node, &vb::reader, &vb::header, 139.751, 35.635);
+  bgIdx_t start_node_idx = vb::node.idx;
+  bgNodeFetchNearest(&vb::node, &vb::reader, &vb::header, 139.800, 35.635);
+  bgIdx_t goal_node_idx = vb::node.idx;
   
-  bgAStarVisited_t visited;
-  vibelt_bg_check(bgAStarVisitedCreate(&visited, header.node_count, 0));
-  bgAStarHeap_t heap;
-  vibelt_bg_check(bgAStarHeapCreate(&heap, header.node_count));
-  bgPath_t path;
-  vibelt_bg_check(bgPathCreate(&path, header.node_count));
-
-  bgNodeFetchNearest(&node, &reader, &header, 139.751, 35.635);
-  bgIdx_t start_node_idx = node.idx;
-  bgNodeFetchNearest(&node, &reader, &header, 139.800, 35.635);
-  bgIdx_t goal_node_idx = node.idx;
-
   clock_t start = clock();
-  vibelt_bg_check(bgAStar(
-    &reader, &header,
-    &nc, &wc,
-    &node, &way,
-    &visited, &heap,
-    start_node_idx, goal_node_idx,
-    1,
-    &path
-  ));
+  vb::check(vb::bg_astar(start_node_idx, goal_node_idx, 2));
   clock_t end = clock();
 
-  Serial.printf("path = {");
-  for(bgIdx_t i = 0; i < path.size; i++) {
-    Serial.printf("%u -> ", path.node_idx_order[i]);
-  }
-  Serial.printf("}\n");
-
   Serial.printf("time: %.4lf sec\n", (double)(end - start) / CLOCKS_PER_SEC);
-  Serial.printf("| visited | allocated: %u, used: %u\n", visited.capacity, visited.size);
-  Serial.printf("| heap    | allocated: %u, used: %u\n", heap.capacity, heap.peak_size);
-  Serial.printf("| path    | allocated: %u, used: %u\n", path.capacity, path.size);
+  Serial.printf("| visited | allocated: %u, used: %u\n", vb::visited.capacity, vb::visited.size);
+  Serial.printf("| heap    | allocated: %u, used: %u\n", vb::heap.capacity, vb::heap.peak_size);
+  Serial.printf("| path    | allocated: %u, used: %u\n", vb::path.capacity, vb::path.size);
 }
 
 void loop() {
-  switch(gui_id) {
-    case GUI_NEUTRAL:
-      vibelt_check(gui_neutral_runtime());
-      break;
-
-    case GUI_WEIGHT:
-      vibelt_check(gui_weight_runtime());
-      break;
-
-    default:
-      vibelt_panic("unknown gui id.");
-      break;
-  }
+  vb::check(vb::dpy_runtime());
+  vb::check(vb::gui_runtime());
 
   delay(50);
 }
