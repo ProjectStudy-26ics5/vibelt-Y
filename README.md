@@ -31,6 +31,7 @@ ESP32S3 Dev Module
 * Adafruit ILI9341 by Adafruit
 * XPT2046_Touchscreen by Paul Stoffregen
 * TinyGPSPlus by Mikal Hart
+* Adafruit BNO055 by Adafruit
 
 ## 6. bgをSDカードに書き込む方法
 ファイルシステムを利用しないで、生書き込みをします。

@@ -31,6 +31,10 @@ namespace vb {
 
 #define TCH_SPI_CS    6
 
+// 慣性計測ユニット
+#define IMU_I2C_SDA   8
+#define IMU_I2C_SCL   3
+
 // 振動モータ
 #define MT0_GPIO      0
 #define MT1_GPIO      0
@@ -59,6 +63,11 @@ extern uint16_t tch_y;
 Result dpy_setup();
 Result dpy_runtime();
 bool dpy_touched(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+
+// 慣性計測ユニット
+Result imu_setup();
+Result imu_runtime();
+float imu_compass();
 
 };
 
