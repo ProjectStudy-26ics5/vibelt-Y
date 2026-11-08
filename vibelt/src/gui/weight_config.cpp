@@ -146,50 +146,50 @@ Result gui_weight_config_runtime() {
     RETURN_BTN_W, RETURN_BTN_H
   )) {
     start_weight = 0;
-    gui_change(GuiKind::Root);
+    return gui_change(GuiKind::Root);
   }
 
   /* 次の重みに進むボタン */
-  else if(start_weight + ITEM_COUNT < nc.dim + wc.dim && dpy_touched(
+  if(start_weight + ITEM_COUNT < nc.dim + wc.dim && dpy_touched(
     NEXT_BTN_X, NEXT_BTN_Y,
     NEXT_BTN_W, NEXT_BTN_H
   )) {
     start_weight += ITEM_COUNT;
-    gui_change(GuiKind::WeightConfig);
+    return gui_change(GuiKind::WeightConfig);
   }
 
   /* 前の重みに戻るボタン */
-  else if(start_weight > 0 && dpy_touched(
+  if(start_weight > 0 && dpy_touched(
     BACK_BTN_X, BACK_BTN_Y,
     BACK_BTN_W, BACK_BTN_H
   )) {
     start_weight -= ITEM_COUNT;
-    gui_change(GuiKind::WeightConfig);
+    return gui_change(GuiKind::WeightConfig);
   }
 
   /* スライダ */
-  else {
-    for(uint8_t i = 0; i < ITEM_COUNT; i++) {
-      bgIdx_t weight_i = start_weight + i;
-      if(weight_i >= nc.dim + wc.dim) break;
+  for(uint8_t i = 0; i < ITEM_COUNT; i++) {
+    bgIdx_t weight_i = start_weight + i;
+    if(weight_i >= nc.dim + wc.dim) break;
 
-      uint16_t x = ITEM_X + ITEM_SLIDER_X;
-      uint16_t y = ITEM_Y + ITEM_H * i + ITEM_SLIDER_Y;
+    uint16_t x = ITEM_X + ITEM_SLIDER_X;
+    uint16_t y = ITEM_Y + ITEM_H * i + ITEM_SLIDER_Y;
 
-      if(dpy_touched(
-        x, y,
-        ITEM_SLIDER_W, ITEM_SLIDER_H
-      )) {
-        bgWeight_t weight = ((float)tch_x - (float)(x + ITEM_SLIDER_HW)) / (float)(ITEM_SLIDER_HW);
+    if(dpy_touched(
+      x, y,
+      ITEM_SLIDER_W, ITEM_SLIDER_H
+    )) {
+      bgWeight_t weight = ((float)tch_x - (float)(x + ITEM_SLIDER_HW)) / (float)(ITEM_SLIDER_HW);
 
-        if(weight_i < nc.dim) {
-          weight_slider(x, y, (nc.weights[weight_i] = weight));
-        }else {
-          weight_i -= nc.dim;
+      if(weight_i < nc.dim) {
+        weight_slider(x, y, (nc.weights[weight_i] = weight));
+      }else {
+        weight_i -= nc.dim;
 
-          weight_slider(x, y, (wc.weights[weight_i] = weight));
-        }
+        weight_slider(x, y, (wc.weights[weight_i] = weight));
       }
+
+      return Result::Ok();
     }
   }
 

@@ -35,6 +35,7 @@ void setup() {
   Serial.printf("way_stride = %llu\n", vb::header.way_stride);
 
   /* 経路探索テスト */
+  return;
   bgNodeFetchNearest(&vb::node, &vb::reader, &vb::header, 139.751, 35.635);
   bgIdx_t start_node_idx = vb::node.idx;
   bgNodeFetchNearest(&vb::node, &vb::reader, &vb::header, 139.800, 35.635);

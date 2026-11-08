@@ -76,7 +76,7 @@ Result gui_root_runtime() {
     WEIGHT_BTN_X, WEIGHT_BTN_Y,
     WEIGHT_BTN_W, WEIGHT_BTN_H
   )) {
-    gui_change(GuiKind::WeightConfig);
+    return gui_change(GuiKind::WeightConfig);
   }
 
   return Result::Ok();
