@@ -11,8 +11,8 @@ void setup() {
   Serial.begin(115200);
 
   vb::check(vb::sd_setup(0));
-  vb::check(vb::dpy_setup());
   vb::check(vb::bg_setup());
+  vb::check(vb::dpy_setup());
   vb::check(vb::gui_change(vb::GuiKind::Root));
 
   /* テスト */
