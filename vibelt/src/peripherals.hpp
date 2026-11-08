@@ -35,6 +35,10 @@ namespace vb {
 #define IMU_I2C_SDA   8
 #define IMU_I2C_SCL   3
 
+// GPS (モジュールのRXをマイコンのTXに、TXをRXに接続することに注意してください)
+#define GPS_UART_TX  20
+#define GPS_UART_RX  19
+
 // 振動モータ
 #define MT0_GPIO      0
 #define MT1_GPIO      0
@@ -68,6 +72,13 @@ bool dpy_touched(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 Result imu_setup();
 Result imu_runtime();
 float imu_compass();
+
+// GPS
+extern double gps_lon;
+extern double gps_lat;
+
+Result gps_setup();
+Result gps_runtime();
 
 };
 

@@ -13,6 +13,7 @@ void setup() {
   vb::check(vb::sd_setup(0));
   vb::check(vb::bg_setup());
   vb::check(vb::imu_setup());
+  vb::check(vb::gps_setup());
   vb::check(vb::dpy_setup());
   vb::check(vb::gui_change(vb::GuiKind::Root));
 
@@ -54,10 +55,12 @@ void setup() {
 
 void loop() {
   vb::check(vb::imu_runtime());
+  vb::check(vb::gps_runtime());
   vb::check(vb::dpy_runtime());
   vb::check(vb::gui_runtime());
 
   // Serial.printf("compass = %f\n", vb::imu_compass());
+  // Serial.printf("lon = %lf, lat = %lf\n", vb::gps_lon, vb::gps_lat);
 
   delay(50);
 }
