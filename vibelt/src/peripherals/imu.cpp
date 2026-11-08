@@ -28,9 +28,7 @@ Result imu_runtime() {
 
 float imu_compass() {
   // センサの取り付け向きによって多少変更する可能背があります
-
-  // ラジアンを用います
-  return event.orientation.x / 180.0f * M_PI;
+  return event.orientation.x;
 }
 
 };
