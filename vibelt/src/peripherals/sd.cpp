@@ -17,6 +17,9 @@ Result sd_setup(size_t start_sector) {
 
   // 挿入スイッチ
   pinMode(SD_SW, INPUT);
+  if(digitalRead(SD_SW) == LOW) {
+    return Result::Err("No SD card is inserted.");
+  }
 
   // SDカードハンドラ
   host = SDMMC_HOST_DEFAULT();
