@@ -27,7 +27,7 @@ Result imu_runtime() {
 }
 
 float imu_compass() {
-  // センサの取り付け向きによって多少変更する可能背があります
+  // センサの取り付け向きによって多少変更する可能性があります
   return event.orientation.x;
 }
 
