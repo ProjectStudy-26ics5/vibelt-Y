@@ -10,6 +10,7 @@ void setup() {
   neopixelWrite(LED_GPIO, 0, 0, 0);
   Serial.begin(115200);
 
+  vb::check(vb::mt_setup());
   vb::check(vb::sd_setup(0));
   vb::check(vb::bg_setup());
   vb::check(vb::imu_setup());
@@ -62,5 +63,10 @@ void loop() {
   // Serial.printf("compass = %f\n", vb::imu_compass());
   // Serial.printf("lon = %lf, lat = %lf\n", vb::gps_lon, vb::gps_lat);
 
-  delay(50);
+  static uint8_t i = 0;
+  i = (i + 1) % MT_GPIO_NUM;
+  vb::mt_low_all();
+  vb::mt_high_idx(i);
+
+  delay(100);
 }
