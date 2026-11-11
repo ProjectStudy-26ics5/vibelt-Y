@@ -28,6 +28,7 @@ Result imu_runtime() {
 
 float imu_compass() {
   // センサの取り付け向きによって多少変更する可能性があります
+  // 0以上360未満が期待されます
   return event.orientation.x;
 }
 

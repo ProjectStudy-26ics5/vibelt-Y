@@ -1,6 +1,7 @@
 #include "src/common.hpp"
 #include "src/peripherals.hpp"
 #include "src/gui.hpp"
+#include "src/navigation.hpp"
 
 #include <Arduino.h>
 #include <time.h>
@@ -59,14 +60,15 @@ void loop() {
   vb::check(vb::gps_runtime());
   vb::check(vb::dpy_runtime());
   vb::check(vb::gui_runtime());
+  vb::check(vb::navigation_runtime());
 
   // Serial.printf("compass = %f\n", vb::imu_compass());
   // Serial.printf("lon = %lf, lat = %lf\n", vb::gps_lon, vb::gps_lat);
 
-  static uint8_t i = 0;
-  i = (i + 1) % MT_GPIO_NUM;
-  vb::mt_low_all();
-  vb::mt_high_idx(i);
+  // static uint8_t i = 0;
+  // i = (i + 1) % MT_GPIO_NUM;
+  // vb::mt_low_all();
+  // vb::mt_high_idx(i);
 
   delay(100);
 }
