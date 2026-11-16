@@ -91,6 +91,10 @@ Result gui_astar_setup() {
     }
   }
 
+  dpy.printf("| visited | allocated: %u, used: %u\n", visited.capacity, visited.size);
+  dpy.printf("| heap    | allocated: %u, used: %u\n", heap.capacity, heap.peak_size);
+  dpy.printf("| path    | allocated: %u, used: %u\n", path.capacity, path.size);
+
   succeed = true;
   dpy.print("\nTouch display to navigation.\n");
   goto end;

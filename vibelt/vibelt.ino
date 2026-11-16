@@ -19,6 +19,9 @@ void setup() {
   vb::check(vb::dpy_setup());
   vb::check(vb::gui_change(vb::GuiKind::Root));
 
+  /* 適当に目的地設定してテスト */
+  vb::dest_lon = vb::dest_lat = 0;
+
   /* テスト */
   Serial.printf("nc_pos = %llu\n", vb::header.nc_pos);
   Serial.printf("nc_dim = %u\n", vb::header.nc_dim);
