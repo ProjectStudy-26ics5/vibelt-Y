@@ -73,5 +73,6 @@ void loop() {
   // vb::mt_low_all();
   // vb::mt_high_idx(i);
 
+  // light sleepを使いたいですが、UART通信が難しいので今後の展望
   delay(50);
 }
