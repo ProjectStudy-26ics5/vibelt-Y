@@ -13,8 +13,14 @@ static Result gui_setup() {
     case GuiKind::WeightConfig:
       return gui_weight_config_setup();
     
+    case GuiKind::Dest:
+      return gui_dest_setup();
+    
     case GuiKind::AStar:
       return gui_astar_setup();
+    
+    case GuiKind::Navigation:
+      return gui_navigation_setup();
 
     default:
       return Result::Err("Unknown gui kind.");
@@ -42,8 +48,14 @@ Result gui_runtime() {
     case GuiKind::WeightConfig:
       return gui_weight_config_runtime();
     
+    case GuiKind::Dest:
+      return gui_dest_runtime();
+    
     case GuiKind::AStar:
       return gui_astar_runtime();
+
+    case GuiKind::Navigation:
+      return gui_navigation_runtime();
     
     default:
       return Result::Err("Unknown gui kind.");

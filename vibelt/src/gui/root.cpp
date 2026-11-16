@@ -79,6 +79,15 @@ Result gui_root_runtime() {
     return gui_change(GuiKind::WeightConfig);
   }
 
+  /* 目的地設定ボタン */
+  if(dpy_touched(
+    DEST_BTN_X, DEST_BTN_Y,
+    DEST_BTN_W, DEST_BTN_H
+  )) {
+    return gui_change(GuiKind::Dest);
+  }
+
+  /* A*ボタン */
   if(dpy_touched(
     ASTAR_BTN_X, ASTAR_BTN_Y,
     ASTAR_BTN_W, ASTAR_BTN_H

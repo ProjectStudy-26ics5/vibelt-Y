@@ -118,7 +118,7 @@ Result gui_astar_runtime() {
     DPY_H_RES, DPY_V_RES
   )) {
     if(succeed) {
-      return gui_change(GuiKind::Root); // あとで、ナビゲーション画面を作ります
+      return gui_change(GuiKind::Navigation);
     }else {
       return gui_change(GuiKind::Root);
     }
