@@ -59,7 +59,7 @@ Result gui_astar_setup() {
   if(!isnan(gps_lon) && !isnan(gps_lat)) {
     bgNodeFetchNearest(&node, &reader, &header, gps_lon, gps_lat);
     start_node_idx = node.idx;
-    print_ok("start node idx is %u.", start_node_idx);
+    print_ok("start node has been determined.");
 
   }else {
     print_err("Unable to obtain coordinates from the GPS.");
@@ -71,7 +71,7 @@ Result gui_astar_setup() {
   if(!isnan(dest_lon) && !isnan(dest_lat)) {
     bgNodeFetchNearest(&node, &reader, &header, dest_lon, dest_lat);
     goal_node_idx = node.idx;
-    print_ok("goal node idx is %u.", goal_node_idx);
+    print_ok("goal node has been determined.");
 
   }else {
     print_err("No destination has been specified.");
@@ -91,9 +91,13 @@ Result gui_astar_setup() {
     }
   }
 
-  dpy.printf("| visited | allocated: %u, used: %u\n", visited.capacity, visited.size);
-  dpy.printf("| heap    | allocated: %u, used: %u\n", heap.capacity, heap.peak_size);
-  dpy.printf("| path    | allocated: %u, used: %u\n", path.capacity, path.size);
+  dpy.printf("+---------+------------------+------------------+\n");
+  dpy.printf("| memory  | allocated        | used             |\n");
+  dpy.printf("+---------+------------------+------------------+\n");
+  dpy.printf("| visited | %16u | %16u |\n", (unsigned)visited.capacity, (unsigned)visited.size);
+  dpy.printf("| heap    | %16u | %16u |\n", (unsigned)heap.capacity,    (unsigned)heap.peak_size);
+  dpy.printf("| path    | %16u | %16u |\n", (unsigned)path.capacity,    (unsigned)path.size);
+  dpy.printf("+---------+------------------+------------------+\n");
 
   succeed = true;
   dpy.print("\nTouch display to navigation.\n");
