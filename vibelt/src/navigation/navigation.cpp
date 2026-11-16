@@ -11,6 +11,8 @@ double dest_lat = NAN;
 Result navigation_runtime() {
   if(!navigating) return Result::Ok();
 
+  // メモ: 中見のやつを持ってくる
+
   // テスト
   uint8_t i = (uint8_t)((imu_compass() / 360.0f) * MT_GPIO_NUM);
   mt_low_all();
