@@ -92,12 +92,12 @@ Result gui_astar_setup() {
   }
 
   succeed = true;
-  dpy.print("\nTouch Display to navigation.\n");
+  dpy.print("\nTouch display to navigation.\n");
   goto end;
 
 err:
   succeed = false;
-  dpy.print("\nTouch Display to root gui.\n");
+  dpy.print("\nTouch display to return.\n");
   goto end;
 
 end:
