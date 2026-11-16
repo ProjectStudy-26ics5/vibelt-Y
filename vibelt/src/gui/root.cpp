@@ -79,6 +79,13 @@ Result gui_root_runtime() {
     return gui_change(GuiKind::WeightConfig);
   }
 
+  if(dpy_touched(
+    ASTAR_BTN_X, ASTAR_BTN_Y,
+    ASTAR_BTN_W, ASTAR_BTN_H
+  )) {
+    return gui_change(GuiKind::AStar);
+  }
+
   return Result::Ok();
 }
 

@@ -7,7 +7,8 @@ namespace vb {
 
 enum class GuiKind {
   Root,
-  WeightConfig
+  WeightConfig,
+  AStar,
 };
 extern GuiKind current_gui;
 
@@ -21,6 +22,9 @@ Result gui_root_runtime();
 
 Result gui_weight_config_setup();
 Result gui_weight_config_runtime();
+
+Result gui_astar_setup();
+Result gui_astar_runtime();
 
 };
 

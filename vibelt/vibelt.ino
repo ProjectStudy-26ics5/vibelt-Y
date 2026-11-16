@@ -70,5 +70,5 @@ void loop() {
   // vb::mt_low_all();
   // vb::mt_high_idx(i);
 
-  delay(100);
+  delay(50);
 }

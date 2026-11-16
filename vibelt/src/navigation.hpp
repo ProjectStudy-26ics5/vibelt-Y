@@ -6,6 +6,8 @@
 namespace vb {
 
 extern bool navigating;
+extern double dest_lon;
+extern double dest_lat;
 
 Result navigation_runtime();
 
